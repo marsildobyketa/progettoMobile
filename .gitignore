@@ -1,0 +1,5 @@
+*.DS_Store*
+Progetto/.DS_Store
+Progetto/.gradle
+Progetto/.idea
+Progetto/local.properties
