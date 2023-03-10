@@ -20,11 +20,12 @@ public class LocationsHolder {
 
     private LocationsHolder(Context context) {
         mLocations = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        mLocations.add(new Location("London"));
+        /*for (int i = 0; i < 10; i++) {
             Location location = new Location();
             location.setName("Location # " + i);
             mLocations.add(location);
-        }
+        }*/
     }
 
     public List<Location> getLocations() {
