@@ -29,6 +29,8 @@ public class DetailLocationFragment extends Fragment {
     private TextView mLocationNameTextView;
     private TextView mDescriptionTextView;
     private TextView mPressureTextView;
+    private TextView mHumidityTextView;
+    private TextView mWindSpeedTextView;
 
     public static DetailLocationFragment newInstance(UUID locationId) {
         Bundle args = new Bundle();
@@ -58,11 +60,15 @@ public class DetailLocationFragment extends Fragment {
             mLocationNameTextView = v.findViewById(R.id.tvLocationName);
             mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
             mPressureTextView = v.findViewById(R.id.tvPressureValue);
+            mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
+            mWindSpeedTextView = v.findViewById(R.id.tvWindSpeedValue);
 
             // Set values in view
-            mLocationNameTextView.setText(weather.getCityName());
-            mDescriptionTextView.setText(weather.getDescription());
-            mPressureTextView.setText(weather.getPressure() + " [Pa]");
+            mLocationNameTextView.setText(weather.getCityName().toUpperCase());
+            mDescriptionTextView.setText("\t" + weather.getDescription());
+            mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
+            mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
+            mWindSpeedTextView.setText("\t\t\t" + weather.getWindSpeed() + " [m/s]");
 
         } catch (JSONException e) {
             System.err.println(e.getMessage());
