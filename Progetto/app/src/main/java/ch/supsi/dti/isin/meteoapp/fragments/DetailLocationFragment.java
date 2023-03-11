@@ -64,15 +64,19 @@ public class DetailLocationFragment extends Fragment {
             mWindSpeedTextView = v.findViewById(R.id.tvWindSpeedValue);
 
             // Set values in view
+            // TODO: Set country icon
             mLocationNameTextView.setText(weather.getCityName().toUpperCase());
+            // TODO: Tabulations are temporary
             mDescriptionTextView.setText("\t" + weather.getDescription());
             mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
             mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
             mWindSpeedTextView.setText("\t\t\t" + weather.getWindSpeed() + " [m/s]");
 
+            // TODO: Use unused information above such as temp, max, min, sunrise, sunset, ...
+            // TODO: On rotation put infos on the right instead of underneath?
+
         } catch (JSONException e) {
             System.err.println(e.getMessage());
-            //throw new RuntimeException(e);
         }
         return v;
     }
