@@ -1,5 +1,6 @@
 package ch.supsi.dti.isin.meteoapp.model;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,8 +14,6 @@ public class WeatherModel {
             // Set main.temp to Metric, otherwise temnperature will be in Kelvin!!
 
             response = new JSONObject("{\"coord\":{\"lon\":-0.13,\"lat\":51.51},\"weather\":[{\"id\":300,\"main\":\"Drizzle\",\"description\":\"light intensity drizzle\",\"icon\":\"09d\"}],\"base\":\"stations\",\"main\":{\"temp\":280.32,\"pressure\":1012,\"humidity\":81,\"temp_min\":279.15,\"temp_max\":281.15},\"visibility\":10000,\"wind\":{\"speed\":4.1,\"deg\":80},\"clouds\":{\"all\":90},\"dt\":1485789600,\"sys\":{\"type\":1,\"id\":5091,\"message\":0.0103,\"country\":\"GB\",\"sunrise\":1485762037,\"sunset\":1485794875},\"id\":2643743,\"name\":\"London\",\"cod\":200}\n");
-
-            //System.out.println(response.getJSONObject("main").);
         }catch(JSONException jsone){
             System.err.println("Error while requesting JSON.\n" + jsone.getMessage());
         }
@@ -25,17 +24,40 @@ public class WeatherModel {
         JSONObject weather = this.requestWeather(location);
         if(weather == null) return null;
 
+        // Needed to only get the first weather element, otherwise because of the JSON format
+        // the JSONObject class won't know how to handle multiple elements in it.
+        //
+        // Example:
+        //
+        //  This works:
+        //  "coord": {
+        //      "lon": -0.13,
+        //      "lat": 51.51
+        //  }
+        //
+        //  This does not work (without the following change):
+        //  "weather": [
+        //      {
+        //          "id": 300,
+        //          "main": "Drizzle",
+        //          "description": "light intensity drizzle",
+        //          "icon": "09d"
+        //      }
+        //  ]
+        //
+        JSONObject subWeather = new JSONObject(weather.getJSONArray("weather").get(0).toString());
+
         return new WeatherCondition(
-                weather.getJSONObject("weather").getInt("id"),
-                weather.getJSONObject("weather").getString("main"),
-                weather.getJSONObject("weather").getString("description"),
-                weather.getJSONObject("weather").getString("icon"),
+                subWeather.getInt("id"),
+                subWeather.getString("main"),
+                subWeather.getString("description"),
+                subWeather.getString("icon"),
                 weather.getJSONObject("main").getDouble("temp"),
                 weather.getJSONObject("main").getInt("pressure"),
                 weather.getJSONObject("main").getInt("humidity"),
                 weather.getJSONObject("main").getDouble("temp_min"),
                 weather.getJSONObject("main").getDouble("temp_max"),
-                weather.getJSONObject("name").toString(),
+                weather.getString("name"),
                 weather.getJSONObject("sys").getString("country"),
                 weather.getJSONObject("sys").getLong("sunrise"),
                 weather.getJSONObject("sys").getLong("sunset"),
