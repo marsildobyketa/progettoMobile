@@ -21,6 +21,7 @@ public class LocationsHolder {
     private LocationsHolder(Context context) {
         mLocations = new ArrayList<>();
         mLocations.add(new Location("London"));
+        mLocations.add(new Location("Milan"));
         /*for (int i = 0; i < 10; i++) {
             Location location = new Location();
             location.setName("Location # " + i);
