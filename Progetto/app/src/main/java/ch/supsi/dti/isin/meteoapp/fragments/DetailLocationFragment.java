@@ -70,9 +70,9 @@ public class DetailLocationFragment extends Fragment {
             mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
 
             // Set values in view
-            mActualTemperatureTextView.setText(weather.getTemperature() + "° C");
-            mMinTemperatureTextView.setText(weather.getMinTemperature() + "° C");
-            mMaxTemperatureTextView.setText(weather.getMaxTemperature() + "° C");
+            mActualTemperatureTextView.setText(weather.getTemperature() + "°");
+            mMinTemperatureTextView.setText(weather.getMinTemperature() + "°");
+            mMaxTemperatureTextView.setText(weather.getMaxTemperature() + "°");
 
             // TODO: Set country icon
             mLocationNameTextView.setText(weather.getCityName().toUpperCase());
@@ -82,7 +82,7 @@ public class DetailLocationFragment extends Fragment {
             mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
             mWindSpeedTextView.setText("\t\t\t" + weather.getWindSpeed() + " [m/s]");
 
-            // TODO: Use unused information above such as temp, max, min, sunrise, sunset, ...
+            // TODO: Use unused information above such sunrise, sunset, ...
             // TODO: On rotation put infos on the right instead of underneath?
 
         } catch (JSONException e) {
