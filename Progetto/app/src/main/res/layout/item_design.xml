@@ -29,6 +29,7 @@
 
         </androidx.cardview.widget.CardView>
         <TextView
+            android:id="@+id/name"
             android:layout_width="120dp"
             android:layout_height="30dp"
             android:text="City"
@@ -38,6 +39,21 @@
             android:layout_marginTop="20dp"
             android:layout_marginLeft="20dp"
             >
+
+        </TextView>
+
+        <TextView
+
+            android:id="@+id/state"
+            android:layout_width="140dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@id/imageView"
+            android:layout_below="@+id/name"
+
+            android:text="State"
+            android:textColor="#000"
+            android:textSize="15sp">
 
         </TextView>
 

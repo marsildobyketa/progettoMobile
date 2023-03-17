@@ -71,10 +71,11 @@ public class ListFragment extends Fragment {
 
     private class LocationHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mNameTextView;
+        private TextView nNameStateTextView;
         private Location mLocation;
 
         public LocationHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item, parent, false));
+            super(inflater.inflate(R.layout.item_design, parent, false));
             itemView.setOnClickListener(this);
             mNameTextView = itemView.findViewById(R.id.name);
         }
