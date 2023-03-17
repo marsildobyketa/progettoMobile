@@ -57,21 +57,20 @@ public class DetailLocationFragment extends Fragment {
         try {
             WeatherCondition weather = wm.getWeatherInLocation(mLocation.getName());
             // Bind components
-            mLocationNameTextView = v.findViewById(R.id.tvLocationName);
-            mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
+           // mLocationNameTextView = v.findViewById(R.id.tvLocationName);
+           // mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
             mPressureTextView = v.findViewById(R.id.tvPressureValue);
             mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
             mWindSpeedTextView = v.findViewById(R.id.tvWindSpeedValue);
 
             // Set values in view
             // TODO: Set country icon
-            mLocationNameTextView.setText(weather.getCityName().toUpperCase());
+            //mLocationNameTextView.setText(weather.getCityName().toUpperCase());
             // TODO: Tabulations are temporary
-            mDescriptionTextView.setText("\t" + weather.getDescription());
+           // mDescriptionTextView.setText("\t" + weather.getDescription());
             mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
             mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
             mWindSpeedTextView.setText("\t\t\t" + weather.getWindSpeed() + " [m/s]");
-
             // TODO: Use unused information above such as temp, max, min, sunrise, sunset, ...
             // TODO: On rotation put infos on the right instead of underneath?
 
