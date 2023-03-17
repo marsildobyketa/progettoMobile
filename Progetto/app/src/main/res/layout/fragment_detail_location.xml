@@ -331,7 +331,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@android:drawable/btn_dialog" />
+                app:srcCompat="@android:drawable/btn_dialog"/>
 
             <TextView
                 android:id="@+id/tvLocationName"
