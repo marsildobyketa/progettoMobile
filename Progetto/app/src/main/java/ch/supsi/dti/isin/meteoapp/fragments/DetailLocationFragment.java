@@ -16,6 +16,7 @@ import org.json.JSONException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -82,11 +83,11 @@ public class DetailLocationFragment extends Fragment {
             // TODO: Set country icon
             mLocationNameTextView.setText(weather.getCityName());
             // TODO: Tabulations are temporary
-            mDescriptionTextView.setText("\t" + weather.getDescription());
-            mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
-            mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
-            mSunriseTextView.setText("\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunrise()));
-            mSunsetTextView.setText("\t\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunset()));
+            mDescriptionTextView.setText(getFormattedString(weather.getDescription()));
+            mPressureTextView.setText(weather.getPressure() + " [Pa]");
+            mHumidityTextView.setText(weather.getHumidity() + " %");
+            mSunriseTextView.setText(getFormattedDate(weather.getSunrise()));
+            mSunsetTextView.setText(getFormattedDate(weather.getSunset()));
 
             // TODO: Use unused information above such sunrise, sunset, ...
             // TODO: On rotation put infos on the right instead of underneath?
@@ -101,6 +102,15 @@ public class DetailLocationFragment extends Fragment {
         // Given timestamp is in UNIX time, therefore must multiply by 1000.
         Date d = new Date(timestamp * 1000);
         return String.format("%02d : %02d : %02d", d.getHours(), d.getMinutes(), d.getSeconds());
+    }
+
+    private String getFormattedString(String str){
+        String[] words = str.split(" ");
+        StringBuilder builder = new StringBuilder();
+        for(String word : words){
+            builder.append(word.substring(0, 1).toUpperCase()).append(word.substring(1)).append(" ");
+        }
+        return builder.toString().trim();
     }
 }
 
