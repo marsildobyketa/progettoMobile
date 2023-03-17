@@ -31,6 +31,9 @@ public class DetailLocationFragment extends Fragment {
     private TextView mPressureTextView;
     private TextView mHumidityTextView;
     private TextView mWindSpeedTextView;
+    private TextView mActualTemperatureTextView;
+    private TextView mMinTemperatureTextView;
+    private TextView mMaxTemperatureTextView;
 
     public static DetailLocationFragment newInstance(UUID locationId) {
         Bundle args = new Bundle();
@@ -62,8 +65,15 @@ public class DetailLocationFragment extends Fragment {
             mPressureTextView = v.findViewById(R.id.tvPressureValue);
             mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
             mWindSpeedTextView = v.findViewById(R.id.tvWindSpeedValue);
+            mActualTemperatureTextView = v.findViewById(R.id.tvActualTemperature);
+            mMinTemperatureTextView = v.findViewById(R.id.tvMinTemperature);
+            mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
 
             // Set values in view
+            mActualTemperatureTextView.setText(weather.getTemperature() + "° C");
+            mMinTemperatureTextView.setText(weather.getMinTemperature() + "° C");
+            mMaxTemperatureTextView.setText(weather.getMaxTemperature() + "° C");
+
             // TODO: Set country icon
             mLocationNameTextView.setText(weather.getCityName().toUpperCase());
             // TODO: Tabulations are temporary
