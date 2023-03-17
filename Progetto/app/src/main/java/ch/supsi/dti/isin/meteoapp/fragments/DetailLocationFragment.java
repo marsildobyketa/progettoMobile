@@ -14,6 +14,9 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 import ch.supsi.dti.isin.meteoapp.R;
@@ -30,7 +33,8 @@ public class DetailLocationFragment extends Fragment {
     private TextView mDescriptionTextView;
     private TextView mPressureTextView;
     private TextView mHumidityTextView;
-    private TextView mWindSpeedTextView;
+    private TextView mSunriseTextView;
+    private TextView mSunsetTextView;
     private TextView mActualTemperatureTextView;
     private TextView mMinTemperatureTextView;
     private TextView mMaxTemperatureTextView;
@@ -64,23 +68,25 @@ public class DetailLocationFragment extends Fragment {
             mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
             mPressureTextView = v.findViewById(R.id.tvPressureValue);
             mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
-            mWindSpeedTextView = v.findViewById(R.id.tvWindSpeedValue);
+            mSunriseTextView = v.findViewById(R.id.tvSunriseValue);
+            mSunsetTextView = v.findViewById(R.id.tvSunsetValue);
             mActualTemperatureTextView = v.findViewById(R.id.tvActualTemperature);
             mMinTemperatureTextView = v.findViewById(R.id.tvMinTemperature);
             mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
 
             // Set values in view
-            mActualTemperatureTextView.setText(weather.getTemperature() + "°");
-            mMinTemperatureTextView.setText(weather.getMinTemperature() + "°");
-            mMaxTemperatureTextView.setText(weather.getMaxTemperature() + "°");
+            mActualTemperatureTextView.setText(Math.round(weather.getTemperature()) + "° C");
+            mMinTemperatureTextView.setText("Min: " + Math.round(weather.getMinTemperature()) + "°");
+            mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
 
             // TODO: Set country icon
-            mLocationNameTextView.setText(weather.getCityName().toUpperCase());
+            mLocationNameTextView.setText(weather.getCityName());
             // TODO: Tabulations are temporary
             mDescriptionTextView.setText("\t" + weather.getDescription());
             mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
             mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
-            mWindSpeedTextView.setText("\t\t\t" + weather.getWindSpeed() + " [m/s]");
+            mSunriseTextView.setText("\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunrise()));
+            mSunsetTextView.setText("\t\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunset()));
 
             // TODO: Use unused information above such sunrise, sunset, ...
             // TODO: On rotation put infos on the right instead of underneath?
@@ -89,6 +95,12 @@ public class DetailLocationFragment extends Fragment {
             System.err.println(e.getMessage());
         }
         return v;
+    }
+
+    private String getFormattedDate(long timestamp){
+        // Given timestamp is in UNIX time, therefore must multiply by 1000.
+        Date d = new Date(timestamp * 1000);
+        return String.format("%02d : %02d : %02d", d.getHours(), d.getMinutes(), d.getSeconds());
     }
 }
 
