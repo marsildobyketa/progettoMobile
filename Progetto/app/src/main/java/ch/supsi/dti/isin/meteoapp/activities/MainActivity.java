@@ -2,8 +2,8 @@ package ch.supsi.dti.isin.meteoapp.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 
 import ch.supsi.dti.isin.meteoapp.R;
 import ch.supsi.dti.isin.meteoapp.fragments.ListFragment;
+import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationAccuracy;
@@ -21,13 +22,14 @@ import io.nlopez.smartlocation.location.config.LocationParams;
 public class MainActivity extends AppCompatActivity {
 
     private final static int LOCATION_REQUEST_PERMISSION_CODE = 1;
+    private static Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_single_fragment);
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+        fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
             fragment = new ListFragment();
             fm.beginTransaction()
@@ -63,14 +65,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startLocationListener() {
-
-        System.out.println("Sono in startLocationListener");
-        Log.i("MY_TAG", "Test");
-
         LocationParams.Builder builder = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
                 .setDistance(0)
-                .setInterval(5000); // 5 sec
+                .setInterval(15000); // 5 sec
 
         SmartLocation.with(this)
                 .location().continuous().config(builder.build())
@@ -78,8 +76,20 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onLocationUpdated(android.location.Location location) {
                         // Do something
-                        Log.i("MY_TAG", "Location" + location.toString());
-                        System.out.println("Location: " + location.toString());
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+
+                        // Do geocoding
+
+
+                        // Add current location
+                        if(MainActivity.fragment != null){
+                            ((ListFragment)MainActivity.fragment)
+                                    .addFirstLocation(
+                                            MainActivity.this,
+                                            "Bellinzona"
+                                    );
+                        }
                     }
                 });
     }
