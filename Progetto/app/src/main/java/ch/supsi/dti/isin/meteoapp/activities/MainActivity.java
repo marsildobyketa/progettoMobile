@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationListener() {
 
         System.out.println("Sono in startLocationListener");
-        Log.i("MY_TAG", "Test");
 
         LocationParams.Builder builder = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
