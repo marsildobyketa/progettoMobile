@@ -22,7 +22,6 @@ import ch.supsi.dti.isin.meteoapp.model.WeatherModel;
 
 public class DetailLocationFragment extends Fragment {
     private static final String ARG_LOCATION_ID = "location_id";
-
     private Location mLocation;
     private TextView mPressureTextView;
     private TextView mHumidityTextView;

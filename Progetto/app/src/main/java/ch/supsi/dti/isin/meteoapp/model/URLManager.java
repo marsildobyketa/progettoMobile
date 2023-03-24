@@ -7,6 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class URLManager{
+
+    public static final String OPEN_WEATHERMAP_API_KEY = "2029667e5e8d87ff1f9a29a34238d79f";
+
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection(); // cast a HttpURLConnection
