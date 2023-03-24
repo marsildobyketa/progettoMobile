@@ -30,4 +30,8 @@ public class Location {
         Id = UUID.randomUUID();
         this.setName(name);
     }
+    public Location(UUID id,String name ) {
+        this.Id = id;
+        this.setName(name);
+    }
 }

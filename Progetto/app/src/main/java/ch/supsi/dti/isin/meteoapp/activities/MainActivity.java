@@ -1,9 +1,14 @@
 package ch.supsi.dti.isin.meteoapp.activities;
 
 import android.Manifest;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,7 +17,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import ch.supsi.dti.isin.meteoapp.R;
+import ch.supsi.dti.isin.meteoapp.database.CursorWrapper;
+import ch.supsi.dti.isin.meteoapp.database.DataBaseHelper;
+import ch.supsi.dti.isin.meteoapp.database.DataBaseSchema;
+import ch.supsi.dti.isin.meteoapp.database.LocationContentValues;
 import ch.supsi.dti.isin.meteoapp.fragments.ListFragment;
+import ch.supsi.dti.isin.meteoapp.model.Location;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationAccuracy;
@@ -22,9 +32,19 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int LOCATION_REQUEST_PERMISSION_CODE = 1;
 
+    private SQLiteDatabase mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+
+        Context context = getApplicationContext();
+        mDatabase = new DataBaseHelper(context).getWritableDatabase();
+
+        insertData();
+
+        readData();
+
         setContentView(R.layout.fragment_single_fragment);
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
@@ -36,7 +56,60 @@ public class MainActivity extends AppCompatActivity {
         }
 
         requestPermission();
+
+        mDatabase.close();
     }
+    private void insertData() {
+
+        // istanzio un oggetto TestEntry
+        Location entry = new Location("London");
+        // istanzio un ContentValues per la entry appena istanziata
+        ContentValues values = LocationContentValues.getContentValues(entry);
+        // chiamo il metodo insert sul db che ho in memoria
+        mDatabase.insert(DataBaseSchema.TestTable.NAME, null, values);
+
+    }
+
+    private void readData() {
+        StringBuilder res = new StringBuilder("Data:");
+
+        // istanzio un oggetto CursorWrapper
+        CursorWrapper cursor = queryData();
+
+        // itero, tramite il cursor, tutti i risultati rirornati
+        try {
+            // mi sposto al primo elemento
+            cursor.moveToFirst();
+
+            // fintanto che ci sono elementi
+            while (!cursor.isAfterLast()) {
+                // mi faccio dare l'oggetto TestEntry dal cursor
+                Location entry = cursor.getEntry();
+                res.append("\n").append(entry.getName());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        // mostro i risultati
+        Toast.makeText(this, res.toString(), Toast.LENGTH_SHORT).show();
+        Log.i("Locationn", res.toString());
+    }
+
+    private CursorWrapper queryData() {
+        Cursor cursor = mDatabase.query(
+                DataBaseSchema.TestTable.NAME,
+                null, // columns - null selects all columns
+                null, // where clause
+                null, // where args
+                null, // groupBy
+                null,  // having
+                null  // orderBy
+        );
+        return new CursorWrapper(cursor);
+    }
+
 
     private void requestPermission(){
         if (ContextCompat.checkSelfPermission(this,
@@ -64,8 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startLocationListener() {
 
-        System.out.println("Sono in startLocationListener");
-        Log.i("MY_TAG", "Test");
+
 
         LocationParams.Builder builder = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
