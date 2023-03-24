@@ -7,25 +7,24 @@ import java.util.List;
 import java.util.UUID;
 
 public class LocationsHolder {
-
     private static LocationsHolder sLocationsHolder;
-    private List<Location> mLocations;
+    private static List<Location> mLocations;
 
-    public static LocationsHolder get(Context context) {
+    public static LocationsHolder get(Context context){
         if (sLocationsHolder == null)
             sLocationsHolder = new LocationsHolder(context);
 
         return sLocationsHolder;
     }
 
-    private LocationsHolder(Context context) {
+    private LocationsHolder(Context context){
         mLocations = new ArrayList<>();
+
+        // Current location gets added in MainActivity
+        mLocations.add(new Location("-"));
+
+        // Load saved locations
         mLocations.add(new Location("London"));
-        /*for (int i = 0; i < 10; i++) {
-            Location location = new Location();
-            location.setName("Location # " + i);
-            mLocations.add(location);
-        }*/
     }
 
     public List<Location> getLocations() {
@@ -37,7 +36,10 @@ public class LocationsHolder {
             if (location.getId().equals(id))
                 return location;
         }
-
         return null;
+    }
+
+    public void updateFirstLocation(String locationName){
+        mLocations.get(0).setName(locationName);
     }
 }
