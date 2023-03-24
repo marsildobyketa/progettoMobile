@@ -3,19 +3,14 @@ package ch.supsi.dti.isin.meteoapp.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONException;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -29,8 +24,6 @@ public class DetailLocationFragment extends Fragment {
     private static final String ARG_LOCATION_ID = "location_id";
 
     private Location mLocation;
-    private TextView mLocationNameTextView;
-    private TextView mDescriptionTextView;
     private TextView mPressureTextView;
     private TextView mHumidityTextView;
     private TextView mSunriseTextView;
@@ -38,6 +31,8 @@ public class DetailLocationFragment extends Fragment {
     private TextView mActualTemperatureTextView;
     private TextView mMinTemperatureTextView;
     private TextView mMaxTemperatureTextView;
+    private ImageView mWeatherIcon;
+    private ImageView mCountryFlagIcon;
 
     public static DetailLocationFragment newInstance(UUID locationId) {
         Bundle args = new Bundle();
@@ -64,8 +59,10 @@ public class DetailLocationFragment extends Fragment {
         try {
             WeatherCondition weather = wm.getWeatherInLocation(mLocation.getName());
             // Bind components
-            mLocationNameTextView = v.findViewById(R.id.tvLocationName);
-            mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
+            mWeatherIcon = v.findViewById(R.id.ivMeteoIcon);
+            mCountryFlagIcon = v.findViewById(R.id.ivCountryFlag);
+            TextView mLocationNameTextView = v.findViewById(R.id.tvLocationName);
+            TextView mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
             mPressureTextView = v.findViewById(R.id.tvPressureValue);
             mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
             mSunriseTextView = v.findViewById(R.id.tvSunriseValue);
@@ -80,15 +77,21 @@ public class DetailLocationFragment extends Fragment {
             mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
 
             // TODO: Set country icon
-            mLocationNameTextView.setText(weather.getCityName());
-            // TODO: Tabulations are temporary
-            mDescriptionTextView.setText("\t" + weather.getDescription());
-            mPressureTextView.setText("\t\t\t\t\t\t" + weather.getPressure() + " [Pa]");
-            mHumidityTextView.setText("\t\t\t\t\t\t" + weather.getHumidity() + " %");
-            mSunriseTextView.setText("\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunrise()));
-            mSunsetTextView.setText("\t\t\t\t\t\t\t\t" + getFormattedDate(weather.getSunset()));
+            /*mWeatherIcon.setImageURI(
+                    Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
+            );*/
 
-            // TODO: Use unused information above such sunrise, sunset, ...
+            /*mCountryFlagIcon.setImageURI(
+                    Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
+            );*/
+
+            mLocationNameTextView.setText(weather.getCityName());
+            mDescriptionTextView.setText(getFormattedString(weather.getDescription()));
+            mPressureTextView.setText(weather.getPressure() + " [Pa]");
+            mHumidityTextView.setText(weather.getHumidity() + " %");
+            mSunriseTextView.setText(getFormattedDate(weather.getSunrise()));
+            mSunsetTextView.setText(getFormattedDate(weather.getSunset()));
+
             // TODO: On rotation put infos on the right instead of underneath?
 
         } catch (JSONException e) {
@@ -97,10 +100,20 @@ public class DetailLocationFragment extends Fragment {
         return v;
     }
 
+    @SuppressLint("DefaultLocale")
     private String getFormattedDate(long timestamp){
         // Given timestamp is in UNIX time, therefore must multiply by 1000.
         Date d = new Date(timestamp * 1000);
         return String.format("%02d : %02d : %02d", d.getHours(), d.getMinutes(), d.getSeconds());
+    }
+
+    private String getFormattedString(String str){
+        String[] words = str.split(" ");
+        StringBuilder builder = new StringBuilder();
+        for(String word : words){
+            builder.append(word.substring(0, 1).toUpperCase()).append(word.substring(1)).append(" ");
+        }
+        return builder.toString().trim();
     }
 }
 
