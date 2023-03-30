@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import ch.supsi.dti.isin.meteoapp.database.DataBaseHelper;
+
 public class LocationsHolder {
     private static LocationsHolder sLocationsHolder;
-    private static List<Location> mLocations;
+    private static List<Location> mLocations ;
+
+    DataBaseHelper db;
 
     public static LocationsHolder get(Context context){
         if (sLocationsHolder == null)
@@ -18,13 +22,17 @@ public class LocationsHolder {
     }
 
     private LocationsHolder(Context context){
+
         mLocations = new ArrayList<>();
+        db = new DataBaseHelper(context);
 
         // Current location gets added in MainActivity
         mLocations.add(new Location("-"));
+        mLocations = db.readData(mLocations);
 
-        // Load saved locations
-        mLocations.add(new Location("London"));
+
+
+
     }
 
     public List<Location> getLocations() {
