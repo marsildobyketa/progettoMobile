@@ -34,14 +34,11 @@ public class DetailLocationFragment extends Fragment {
     private TextView mActualTemperatureTextView;
     private TextView mMinTemperatureTextView;
     private TextView mMaxTemperatureTextView;
-
     private TextView mLocationNameTextView;
-
     private TextView mDescriptionTextView;
     private ImageView mWeatherIcon;
     private ImageView mCountryFlagIcon;
 
-    //private WeatherCondition weather;
 
     public static DetailLocationFragment newInstance(UUID locationId) {
         Bundle args = new Bundle();
@@ -58,7 +55,7 @@ public class DetailLocationFragment extends Fragment {
         UUID locationId = (UUID) getArguments().getSerializable(ARG_LOCATION_ID);
         mLocation = LocationsHolder.get(getActivity()).getLocation(locationId);
 
-        //Make api call
+        //Make api calls
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             WeatherCondition weather;
@@ -75,6 +72,7 @@ public class DetailLocationFragment extends Fragment {
         executor.shutdown();
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateWeather(WeatherCondition weather) {
         // Set values in view
         mActualTemperatureTextView.setText(Math.round(weather.getTemperature()) + "° C");
@@ -82,9 +80,9 @@ public class DetailLocationFragment extends Fragment {
         mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
 
         // TODO: Set country icon
-            /*mWeatherIcon.setImageURI(
-                    Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
-            );*/
+        /*mWeatherIcon.setImageURI(
+                   Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
+          );*/
 
             /*mCountryFlagIcon.setImageURI(
                     Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
