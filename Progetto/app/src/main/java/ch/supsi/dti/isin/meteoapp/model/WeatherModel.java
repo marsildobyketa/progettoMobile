@@ -1,5 +1,9 @@
 package ch.supsi.dti.isin.meteoapp.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,9 +42,31 @@ public class WeatherModel {
         }catch(JSONException jsone){
             System.err.println("Error while requesting JSON.\n" + jsone.getMessage());
         } catch (IOException e) {
-            System.out.println("Error while requesting JSON.\n" + e.getMessage());
+            System.out.println("IOException.\n" + e.getMessage());
         }
         return null;
+    }
+
+    public Bitmap getWeatherIcon(String iconName) throws IOException {
+        return this.getImageFromUrl(
+                "https://openweathermap.org/img/wn/" +
+                        iconName
+                        + "@4x.png"
+        );
+    }
+
+    public Bitmap getCountryFlagIcon(String countryCode) throws IOException {
+        return this.getImageFromUrl(
+                "https://flagsapi.com/" +
+                        countryCode.toUpperCase()
+                        + "/flat/64.png"
+        );
+    }
+
+    private Bitmap getImageFromUrl(String url) throws IOException {
+        byte[] responseData = this.urlManager.getUrlBytes(url);
+        // Translates bytes into bitmap image
+        return BitmapFactory.decodeByteArray(responseData, 0, responseData.length);
     }
 
     public WeatherCondition getWeatherInLocation(String location) throws JSONException {

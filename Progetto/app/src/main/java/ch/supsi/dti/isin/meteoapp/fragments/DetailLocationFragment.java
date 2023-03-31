@@ -1,6 +1,7 @@
 package ch.supsi.dti.isin.meteoapp.fragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -59,34 +62,38 @@ public class DetailLocationFragment extends Fragment {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.submit(() -> {
             WeatherCondition weather;
+            Bitmap weatherIcon, countryFlag;
             try {
-                weather = new WeatherModel().getWeatherInLocation(
+                WeatherModel wm = new WeatherModel();
+                weather = wm.getWeatherInLocation(
                         mLocation.getName()
+                );
+                weatherIcon = wm.getWeatherIcon(
+                        weather.getIcon()
+                );
+                countryFlag = wm.getCountryFlagIcon(
+                        weather.getCountryCode()
                 );
             } catch (JSONException e) {
                 System.out.println(e.getLocalizedMessage());
                 throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            getActivity().runOnUiThread(() -> updateWeather(weather));
+            getActivity().runOnUiThread(() -> updateWeather(weather, weatherIcon, countryFlag));
         });
         executor.shutdown();
     }
 
     @SuppressLint("SetTextI18n")
-    private void updateWeather(WeatherCondition weather) {
+    private void updateWeather(WeatherCondition weather, Bitmap weatherIcon, Bitmap countryFlag) {
         // Set values in view
         mActualTemperatureTextView.setText(Math.round(weather.getTemperature()) + "° C");
         mMinTemperatureTextView.setText("Min: " + Math.round(weather.getMinTemperature()) + "°");
         mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
 
-        // TODO: Set country icon
-        /*mWeatherIcon.setImageURI(
-                   Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
-          );*/
-
-            /*mCountryFlagIcon.setImageURI(
-                    Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
-            );*/
+        mWeatherIcon.setImageBitmap(weatherIcon);
+        mCountryFlagIcon.setImageBitmap(countryFlag);
 
         mLocationNameTextView.setText(weather.getCityName());
         mDescriptionTextView.setText(getFormattedString(weather.getDescription()));
@@ -113,8 +120,6 @@ public class DetailLocationFragment extends Fragment {
         mActualTemperatureTextView = v.findViewById(R.id.tvActualTemperature);
         mMinTemperatureTextView = v.findViewById(R.id.tvMinTemperature);
         mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
-
-        // TODO: On rotation put infos on the right instead of underneath?
 
         return v;
     }
