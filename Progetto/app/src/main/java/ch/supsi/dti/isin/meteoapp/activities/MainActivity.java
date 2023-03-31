@@ -48,16 +48,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-       // Context context = getApplicationContext();
-       // mDatabase = new DataBaseHelper(context);
-
-      //  mDatabase.insertData(new ch.supsi.dti.isin.meteoapp.model.Location("Milan"));
-
-        //insertData(new ch.supsi.dti.isin.meteoapp.model.Location("Luino"));
-      // deleteData(list.get(0));
-       // readData();
-
         setContentView(R.layout.fragment_single_fragment);
         FragmentManager fm = getSupportFragmentManager();
         fragment = fm.findFragmentById(R.id.fragment_container);
@@ -67,9 +57,6 @@ public class MainActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-
-//        mDatabase.close();
-
         requestPermission();
     }
 
@@ -79,8 +66,11 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Non ho i permessi
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_PERMISSION_CODE);
-
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_REQUEST_PERMISSION_CODE
+            );
         } else {
             // Ho già i permessi
             startLocationListener();
@@ -88,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
         switch(requestCode){
             case LOCATION_REQUEST_PERMISSION_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -102,9 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void startLocationListener() {
-
-        System.out.println("Sono in startLocationListener");
-
         LocationParams.Builder builder = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
                 .setDistance(0)
@@ -115,19 +102,12 @@ public class MainActivity extends AppCompatActivity {
                 .start(new OnLocationUpdatedListener() {
                     @Override
                     public void onLocationUpdated(android.location.Location location) {
-                        // Do something
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-
-                        // Do geocoding
-
-
                         // Add current location
                         if(MainActivity.fragment != null){
                             ((ListFragment)MainActivity.fragment)
-                                    .addFirstLocation(
-                                            MainActivity.this,
-                                            "Bellinzona"
+                                .addFirstLocation(
+                                    MainActivity.this,
+                                        "Bellinzona"
                                     );
                         }
                     }

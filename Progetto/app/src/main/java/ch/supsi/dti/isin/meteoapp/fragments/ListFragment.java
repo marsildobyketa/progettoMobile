@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -21,10 +22,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ch.supsi.dti.isin.meteoapp.R;
 import ch.supsi.dti.isin.meteoapp.activities.DetailActivity;
@@ -32,29 +39,25 @@ import ch.supsi.dti.isin.meteoapp.activities.MainActivity;
 import ch.supsi.dti.isin.meteoapp.database.DataBaseHelper;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import ch.supsi.dti.isin.meteoapp.model.Location;
+import ch.supsi.dti.isin.meteoapp.model.WeatherCondition;
+import ch.supsi.dti.isin.meteoapp.model.WeatherModel;
 
 public class ListFragment extends Fragment {
     private RecyclerView mLocationRecyclerView;
     private LocationAdapter mAdapter;
-
     private DataBaseHelper mDatabase;
-
     private Button mButtonDelete;
-
-
 
     public void addFirstLocation(Context context, String locationString){
         LocationsHolder.get(context).updateFirstLocation(
                 locationString
         );
-
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
     }
 
@@ -66,18 +69,12 @@ public class ListFragment extends Fragment {
        // button = view.findViewById(R.id.menu_add);
         mLocationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-
-
         List<Location> locations = LocationsHolder.get(getActivity()).getLocations();
         mAdapter = new LocationAdapter(locations);
         mLocationRecyclerView.setAdapter(mAdapter);
 
         return view;
     }
-
-
-
-    // Menu
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -146,35 +143,34 @@ public class ListFragment extends Fragment {
     private class LocationHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView mNameTextView;
         private Location mLocation;
+        private ImageView mImageViewListItemWeatherIcon;
+        private TextView mCountry;
 
 
         public LocationHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item, parent, false));
             itemView.setOnClickListener(this);
             mNameTextView = itemView.findViewById(R.id.name);
+            mImageViewListItemWeatherIcon = itemView.findViewById(R.id.ivListItemWeatherIcon);
             mButtonDelete = itemView.findViewById(R.id.delete);
+            mCountry = itemView.findViewById(R.id.tvCountry);
 
             mButtonDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Location location=null;
-
+                    Location location = null;
 
                     LocationsHolder.get(getContext()).removeItem(getContext(),mLocation.getId());
                     mAdapter.notifyDataSetChanged();
 
                     // Richiama il metodo removeItem per eliminare l'elemento dalla lista di dati dell'adapter
-                   // removeItem(location);
+                    // removeItem(location);
                 }
             });
-
-
-
         }
 
-        public void removeItem(int location) {
-
-
+        private void removeItem(int location) {
+            // TODO: rimuovi location
         }
 
         @Override
@@ -183,9 +179,43 @@ public class ListFragment extends Fragment {
             startActivity(intent);
         }
 
-        public void bind(Location location) {
+        public void bind(Location location){
             mLocation = location;
             mNameTextView.setText(mLocation.getName());
+
+            // Get weather icon
+            //Make api calls
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(() -> {
+                WeatherCondition weather;
+                Bitmap weatherIcon;
+                String countryName;
+                try {
+                    WeatherModel wm = new WeatherModel();
+                    weather = wm.getWeatherInLocation(
+                            location.getName()
+                    );
+                    weatherIcon = wm.getWeatherIcon(
+                            weather.getIcon()
+                    );
+                    countryName = wm.getCountryName(
+                            weather.getCountryCode()
+                    );
+                } catch (JSONException e) {
+                    System.out.println("JSONException: " + e.getLocalizedMessage());
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    System.out.println("IOException: " + e.getLocalizedMessage());
+                    throw new RuntimeException(e);
+                }
+                getActivity().runOnUiThread(() -> updateLocationData(weatherIcon, countryName));
+            });
+            executor.shutdown();
+        }
+
+        private void updateLocationData(Bitmap weatherIcon, String countryName){
+            mImageViewListItemWeatherIcon.setImageBitmap(weatherIcon);
+            mCountry.setText(countryName);
         }
     }
 

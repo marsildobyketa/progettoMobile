@@ -47,6 +47,17 @@ public class WeatherModel {
         return null;
     }
 
+    public String getCountryName(String countryCode) throws IOException, JSONException {
+        // Make request and keep only country name.
+        // Not the prettiest solution but it works, JSONObject keeps
+        // throwing exceptions, I suppose because of special characters.
+        String response = this.urlManager.getUrlString(
+                "https://restcountries.com/v3.1/alpha/" + countryCode
+        ).replace("[{\"name\":{\"common\":\"", "");
+
+        return response.substring(0, response.indexOf("\""));
+    }
+
     public Bitmap getWeatherIcon(String iconName) throws IOException {
         return this.getImageFromUrl(
                 "https://openweathermap.org/img/wn/" +

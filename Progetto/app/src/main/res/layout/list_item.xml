@@ -20,7 +20,7 @@
 
 
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/ivListItemWeatherIcon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:scaleType="centerCrop"
@@ -44,13 +44,12 @@
 
         <TextView
 
-            android:id="@+id/state"
+            android:id="@+id/tvCountry"
             android:layout_width="140dp"
             android:layout_height="30dp"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@id/imageView"
             android:layout_below="@+id/name"
-
             android:text="State"
             android:textColor="#000"
             android:textSize="15sp">
