@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 public class URLManager{
 
@@ -25,7 +26,8 @@ public class URLManager{
             }
             out.close();
             return out.toByteArray();
-        } finally {
+        }
+        finally {
             connection.disconnect();
         }
     }

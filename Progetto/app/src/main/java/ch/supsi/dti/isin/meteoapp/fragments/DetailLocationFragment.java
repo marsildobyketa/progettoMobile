@@ -13,8 +13,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ch.supsi.dti.isin.meteoapp.R;
+import ch.supsi.dti.isin.meteoapp.activities.DetailActivity;
+import ch.supsi.dti.isin.meteoapp.activities.MainActivity;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import ch.supsi.dti.isin.meteoapp.model.Location;
 import ch.supsi.dti.isin.meteoapp.model.WeatherCondition;
@@ -30,8 +34,14 @@ public class DetailLocationFragment extends Fragment {
     private TextView mActualTemperatureTextView;
     private TextView mMinTemperatureTextView;
     private TextView mMaxTemperatureTextView;
+
+    private TextView mLocationNameTextView;
+
+    private TextView mDescriptionTextView;
     private ImageView mWeatherIcon;
     private ImageView mCountryFlagIcon;
+
+    //private WeatherCondition weather;
 
     public static DetailLocationFragment newInstance(UUID locationId) {
         Bundle args = new Bundle();
@@ -47,35 +57,31 @@ public class DetailLocationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID locationId = (UUID) getArguments().getSerializable(ARG_LOCATION_ID);
         mLocation = LocationsHolder.get(getActivity()).getLocation(locationId);
+
+        //Make api call
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            WeatherCondition weather;
+            try {
+                weather = new WeatherModel().getWeatherInLocation(
+                        mLocation.getName()
+                );
+            } catch (JSONException e) {
+                System.out.println(e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+            getActivity().runOnUiThread(() -> updateWeather(weather));
+        });
+        executor.shutdown();
     }
 
-    @SuppressLint("SetTextI18n")
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_detail_location, container, false);
+    private void updateWeather(WeatherCondition weather) {
+        // Set values in view
+        mActualTemperatureTextView.setText(Math.round(weather.getTemperature()) + "° C");
+        mMinTemperatureTextView.setText("Min: " + Math.round(weather.getMinTemperature()) + "°");
+        mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
 
-        WeatherModel wm = new WeatherModel();
-        try {
-            WeatherCondition weather = wm.getWeatherInLocation(mLocation.getName());
-            // Bind components
-            mWeatherIcon = v.findViewById(R.id.ivMeteoIcon);
-            mCountryFlagIcon = v.findViewById(R.id.ivCountryFlag);
-            TextView mLocationNameTextView = v.findViewById(R.id.tvLocationName);
-            TextView mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
-            mPressureTextView = v.findViewById(R.id.tvPressureValue);
-            mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
-            mSunriseTextView = v.findViewById(R.id.tvSunriseValue);
-            mSunsetTextView = v.findViewById(R.id.tvSunsetValue);
-            mActualTemperatureTextView = v.findViewById(R.id.tvActualTemperature);
-            mMinTemperatureTextView = v.findViewById(R.id.tvMinTemperature);
-            mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
-
-            // Set values in view
-            mActualTemperatureTextView.setText(Math.round(weather.getTemperature()) + "° C");
-            mMinTemperatureTextView.setText("Min: " + Math.round(weather.getMinTemperature()) + "°");
-            mMaxTemperatureTextView.setText("Max: " + Math.round(weather.getMaxTemperature()) + "°");
-
-            // TODO: Set country icon
+        // TODO: Set country icon
             /*mWeatherIcon.setImageURI(
                     Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
             );*/
@@ -84,18 +90,34 @@ public class DetailLocationFragment extends Fragment {
                     Uri.parse("file:///data/data/MYFOLDER/myimage.png")     //Set path
             );*/
 
-            mLocationNameTextView.setText(weather.getCityName());
-            mDescriptionTextView.setText(getFormattedString(weather.getDescription()));
-            mPressureTextView.setText(weather.getPressure() + " [Pa]");
-            mHumidityTextView.setText(weather.getHumidity() + " %");
-            mSunriseTextView.setText(getFormattedDate(weather.getSunrise()));
-            mSunsetTextView.setText(getFormattedDate(weather.getSunset()));
+        mLocationNameTextView.setText(weather.getCityName());
+        mDescriptionTextView.setText(getFormattedString(weather.getDescription()));
+        mPressureTextView.setText(weather.getPressure() + " [Pa]");
+        mHumidityTextView.setText(weather.getHumidity() + " %");
+        mSunriseTextView.setText(getFormattedDate(weather.getSunrise()));
+        mSunsetTextView.setText(getFormattedDate(weather.getSunset()));
+    }
 
-            // TODO: On rotation put infos on the right instead of underneath?
+    @SuppressLint("SetTextI18n")
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_detail_location, container, false);
 
-        } catch (JSONException e) {
-            System.err.println(e.getMessage());
-        }
+        // Bind components
+        mWeatherIcon = v.findViewById(R.id.ivMeteoIcon);
+        mCountryFlagIcon = v.findViewById(R.id.ivCountryFlag);
+        mLocationNameTextView = v.findViewById(R.id.tvLocationName);
+        mDescriptionTextView = v.findViewById(R.id.tvDescriptionValue);
+        mPressureTextView = v.findViewById(R.id.tvPressureValue);
+        mHumidityTextView = v.findViewById(R.id.tvHumidityValue);
+        mSunriseTextView = v.findViewById(R.id.tvSunriseValue);
+        mSunsetTextView = v.findViewById(R.id.tvSunsetValue);
+        mActualTemperatureTextView = v.findViewById(R.id.tvActualTemperature);
+        mMinTemperatureTextView = v.findViewById(R.id.tvMinTemperature);
+        mMaxTemperatureTextView = v.findViewById(R.id.tvMaxTemperature);
+
+        // TODO: On rotation put infos on the right instead of underneath?
+
         return v;
     }
 
