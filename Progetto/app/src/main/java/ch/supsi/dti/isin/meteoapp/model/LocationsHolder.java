@@ -1,6 +1,7 @@
 package ch.supsi.dti.isin.meteoapp.model;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,24 @@ public class LocationsHolder {
         // Current location gets added in MainActivity
         mLocations.add(new Location("-"));
         mLocations = db.readData(mLocations);
-
-
-
-
+        db.close();
     }
+
+    public void appendLocations(Location location){
+
+        mLocations.add(location);
+    }
+
+    public void removeItem(Context context,UUID idRecycleViewLocation){
+
+        db = new DataBaseHelper(context);
+        db.deleteData(getLocation(idRecycleViewLocation));
+
+        mLocations.remove(getLocation(idRecycleViewLocation));
+
+       // mLocations.remove(idRecycleView);
+    }
+
 
     public List<Location> getLocations() {
         return mLocations;

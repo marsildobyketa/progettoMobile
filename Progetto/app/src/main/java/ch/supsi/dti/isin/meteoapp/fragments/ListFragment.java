@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import ch.supsi.dti.isin.meteoapp.R;
 import ch.supsi.dti.isin.meteoapp.activities.DetailActivity;
+import ch.supsi.dti.isin.meteoapp.activities.MainActivity;
 import ch.supsi.dti.isin.meteoapp.database.DataBaseHelper;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import ch.supsi.dti.isin.meteoapp.model.Location;
@@ -37,7 +39,7 @@ public class ListFragment extends Fragment {
 
     private DataBaseHelper mDatabase;
 
-    private Button button;
+    private Button mButtonDelete;
 
 
 
@@ -112,12 +114,16 @@ public class ListFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
-
                 String inputText = input.getText().toString();
                 Log.d("ADD",inputText);
-                mDatabase.insertData(new Location(inputText));
+                Location location = new Location(inputText);
+                mDatabase.insertData(location);
+
+               LocationsHolder.get(context).appendLocations(location);
                 // Azioni da eseguire quando si fa clic sul pulsante OK
                 mAdapter.notifyDataSetChanged();
+
+                mDatabase.close();
             }
         });
 
@@ -132,6 +138,7 @@ public class ListFragment extends Fragment {
         // Crea e visualizza la finestra di dialogo
         AlertDialog dialog = builder.create();
         dialog.show();
+
     }
 
     // Holder
@@ -140,10 +147,34 @@ public class ListFragment extends Fragment {
         private TextView mNameTextView;
         private Location mLocation;
 
+
         public LocationHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item, parent, false));
             itemView.setOnClickListener(this);
             mNameTextView = itemView.findViewById(R.id.name);
+            mButtonDelete = itemView.findViewById(R.id.delete);
+
+            mButtonDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Location location=null;
+
+
+                    LocationsHolder.get(getContext()).removeItem(getContext(),mLocation.getId());
+                    mAdapter.notifyDataSetChanged();
+
+                    // Richiama il metodo removeItem per eliminare l'elemento dalla lista di dati dell'adapter
+                   // removeItem(location);
+                }
+            });
+
+
+
+        }
+
+        public void removeItem(int location) {
+
+
         }
 
         @Override

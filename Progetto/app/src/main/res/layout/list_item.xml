@@ -57,6 +57,20 @@
 
         </TextView>
 
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="47dp"
+            android:layout_height="38dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="251dp"
+            android:layout_marginTop="34dp"
+            android:layout_marginEnd="33dp"
+            android:layout_marginBottom="23dp"
+            android:layout_toEndOf="@+id/imageView"
+            android:text="X" />
+
     </RelativeLayout>
 
 </RelativeLayout>
