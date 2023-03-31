@@ -3,6 +3,7 @@ package ch.supsi.dti.isin.meteoapp.activities;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,8 +11,10 @@ import android.location.Location;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private static Fragment fragment;
     private List<ch.supsi.dti.isin.meteoapp.model.Location> list = new ArrayList<>();
     private DataBaseHelper mDatabase;
+    private Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermission();
     }
+
+
 
     private void requestPermission(){
         if (ContextCompat.checkSelfPermission(this,

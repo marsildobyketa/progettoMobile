@@ -2,17 +2,24 @@ package ch.supsi.dti.isin.meteoapp.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,12 +27,17 @@ import java.util.List;
 
 import ch.supsi.dti.isin.meteoapp.R;
 import ch.supsi.dti.isin.meteoapp.activities.DetailActivity;
+import ch.supsi.dti.isin.meteoapp.database.DataBaseHelper;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import ch.supsi.dti.isin.meteoapp.model.Location;
 
 public class ListFragment extends Fragment {
     private RecyclerView mLocationRecyclerView;
     private LocationAdapter mAdapter;
+
+    private DataBaseHelper mDatabase;
+
+    private Button button;
 
 
 
@@ -49,7 +61,10 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         mLocationRecyclerView = view.findViewById(R.id.recycler_view);
+       // button = view.findViewById(R.id.menu_add);
         mLocationRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+
 
         List<Location> locations = LocationsHolder.get(getActivity()).getLocations();
         mAdapter = new LocationAdapter(locations);
@@ -57,6 +72,8 @@ public class ListFragment extends Fragment {
 
         return view;
     }
+
+
 
     // Menu
 
@@ -70,14 +87,51 @@ public class ListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                Toast toast = Toast.makeText(getActivity(),
-                        "Add a location",
-                        Toast.LENGTH_SHORT);
-                toast.show();
+                Context context= getContext();
+                showDialog(context);
+                Log.d("MENU","click menu");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showDialog(Context context) {
+
+        mDatabase = new DataBaseHelper(context);
+        // Crea un nuovo oggetto EditText da aggiungere alla finestra di dialogo
+        final EditText input = new EditText(context);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Insert Location");
+       // builder.setMessage("");
+        builder.setView(input);
+
+        // Aggiungi pulsante OK
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                String inputText = input.getText().toString();
+                Log.d("ADD",inputText);
+                mDatabase.insertData(new Location(inputText));
+                // Azioni da eseguire quando si fa clic sul pulsante OK
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        // Aggiungi pulsante Annulla
+        builder.setNegativeButton("Annulla", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // Azioni da eseguire quando si fa clic sul pulsante Annulla
+            }
+        });
+
+        // Crea e visualizza la finestra di dialogo
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     // Holder
