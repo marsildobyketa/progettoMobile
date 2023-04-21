@@ -64,4 +64,8 @@ public class LocationsHolder {
     public void updateFirstLocation(String locationName){
         mLocations.get(0).setName(locationName);
     }
+
+    public static Location getMyLocation(){
+        return mLocations.get(0);
+    }
 }

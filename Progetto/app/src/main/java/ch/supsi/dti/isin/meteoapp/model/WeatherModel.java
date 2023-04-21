@@ -26,6 +26,10 @@ public class WeatherModel {
         return response.has("name") ? response.getString("name") : "";
     }
 
+    public double getTemperatureInLocation(String location) throws JSONException {
+        return this.requestWeather(location).getJSONObject("main").getDouble("temp");
+    }
+
     private JSONObject requestWeather(String location){
         try{
             // Geocoding

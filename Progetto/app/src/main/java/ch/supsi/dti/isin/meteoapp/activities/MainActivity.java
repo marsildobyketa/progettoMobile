@@ -21,6 +21,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import org.json.JSONException;
 
@@ -28,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import ch.supsi.dti.isin.meteoapp.R;
 import ch.supsi.dti.isin.meteoapp.database.CursorWrapper;
@@ -37,6 +41,7 @@ import ch.supsi.dti.isin.meteoapp.database.LocationContentValues;
 import ch.supsi.dti.isin.meteoapp.fragments.ListFragment;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
 import ch.supsi.dti.isin.meteoapp.model.WeatherModel;
+import ch.supsi.dti.isin.meteoapp.worker.MeteoRetrievalWorker;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationAccuracy;
@@ -63,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
         requestPermission();
+
+        // Background task - controllo temperatura locale
+        PeriodicWorkRequest periodicRequest = new PeriodicWorkRequest.Builder(MeteoRetrievalWorker.class,
+                15, TimeUnit.MINUTES).build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork("POLL WORK",
+                ExistingPeriodicWorkPolicy.KEEP, periodicRequest);
+
     }
 
 
