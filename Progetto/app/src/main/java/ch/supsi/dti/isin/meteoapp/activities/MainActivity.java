@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.nfc.Tag;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -21,6 +22,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +36,7 @@ import ch.supsi.dti.isin.meteoapp.database.DataBaseSchema;
 import ch.supsi.dti.isin.meteoapp.database.LocationContentValues;
 import ch.supsi.dti.isin.meteoapp.fragments.ListFragment;
 import ch.supsi.dti.isin.meteoapp.model.LocationsHolder;
+import ch.supsi.dti.isin.meteoapp.model.WeatherModel;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationAccuracy;
@@ -89,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
     private void startLocationListener() {
         LocationParams.Builder builder = new LocationParams.Builder()
                 .setAccuracy(LocationAccuracy.HIGH)
@@ -102,12 +105,25 @@ public class MainActivity extends AppCompatActivity {
                 .start(new OnLocationUpdatedListener() {
                     @Override
                     public void onLocationUpdated(android.location.Location location) {
+                        WeatherModel wm = new WeatherModel();
+
+                        // Needed to avoid exceptions
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+
+                        String cityName = "";
+
+                        try {
+                            cityName = wm.getLocationNameFromCoordinates(location.getLatitude(), location.getLongitude());
+                        } catch (IOException | JSONException e) {
+                            throw new RuntimeException(e);
+                        }
                         // Add current location
                         if(MainActivity.fragment != null){
                             ((ListFragment)MainActivity.fragment)
                                 .addFirstLocation(
                                     MainActivity.this,
-                                        "Bellinzona"
+                                        cityName
                                     );
                         }
                     }

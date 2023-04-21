@@ -18,6 +18,14 @@ public class WeatherModel {
         this.urlManager = new URLManager();
     }
 
+    public String getLocationNameFromCoordinates(double lat, double lon) throws IOException, JSONException {
+        JSONObject response = new JSONObject(this.urlManager.getUrlString(
+                "https://api.openweathermap.org/geo/1.0/reverse?lat=" + lat + "&lon=" + lon + "&limit=1&appid=" + URLManager.OPEN_WEATHERMAP_API_KEY
+        ).replace("[", "").replace("]", ""));
+
+        return response.has("name") ? response.getString("name") : "";
+    }
+
     private JSONObject requestWeather(String location){
         try{
             // Geocoding
