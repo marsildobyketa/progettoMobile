@@ -1,6 +1,8 @@
 package ch.supsi.dti.isin.meteoapp.activities;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -69,7 +71,16 @@ public class MainActivity extends AppCompatActivity {
         }
         requestPermission();
 
-        // Background task - controllo temperatura locale
+        // Notifications setup
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("weatherChannelID", "WeatherChannel", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Weather app channel");
+            mNotificationManager.createNotificationChannel(channel);
+        }
+
+        // Background task setup - controllo temperatura locale
         PeriodicWorkRequest periodicRequest = new PeriodicWorkRequest.Builder(MeteoRetrievalWorker.class,
                 15, TimeUnit.MINUTES).build();
 

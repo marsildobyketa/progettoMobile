@@ -1,10 +1,10 @@
 package ch.supsi.dti.isin.meteoapp.worker;
 
-import android.app.NotificationManager;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -16,8 +16,11 @@ import ch.supsi.dti.isin.meteoapp.model.WeatherModel;
 
 public class MeteoRetrievalWorker extends Worker{
 
+    private Context mContext;
+
     public MeteoRetrievalWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        mContext = context;
     }
 
     @Override
@@ -35,26 +38,26 @@ public class MeteoRetrievalWorker extends Worker{
                 throw new RuntimeException(e);
             }
             // Check if temperature is above or below bounds
-            if(temperature < 0 || temperature > 30){
+            if(temperature < 0 || temperature > 5){
                 // Crea e manda notifica
-                // TODO
+                this.sendNotification(temperature);
             }
         }
         return Result.success(); // con failure() lo scheduling viene interrotto!
     }
 
-    private void sendNotification(int i) {
-        NotificationManager mNotificationManager = (NotificationManager)
-        getSystemService(Context.NOTIFICATION_SERVICE);
+    private void sendNotification(double currentTemp){
+        NotificationCompat.Builder mBuilder = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            mBuilder = new NotificationCompat.Builder(mContext, "weatherChannelID")
+                    .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                    .setContentTitle("The temperature has" + ((currentTemp > 0) ? "risen" : "fallen")
+                            + " a lot.")
+                    .setContentText("Current temperature: " + currentTemp + " °C")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        }
 
-        // creo il contenuto della notifica
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "default")
-                .setSmallIcon(android.R.drawable.ic_menu_report_image)
-                .setContentTitle("Title")
-                .setContentText("i: " + i)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-        mBuilder.setContentIntent(pi);
-        mNotificationManager.notify(0, mBuilder.build());
+        NotificationManagerCompat manager = NotificationManagerCompat.from(mContext);
+        manager.notify(0, mBuilder.build());
     }
 }
